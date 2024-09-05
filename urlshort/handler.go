@@ -1,6 +1,7 @@
 package urlshort
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -59,9 +60,9 @@ type Url struct {
 	Url  string `yaml:"url"`
 }
 
-func parseYAML(yml []byte) ([]Url, error) {
+func parseYAML(ymlData []byte) ([]Url, error) {
 	var urls []Url
-	err := yaml.Unmarshal(yml, &urls)
+	err := yaml.Unmarshal(ymlData, &urls)
 	if err != nil {
 		panic(err)
 	}
@@ -74,4 +75,23 @@ func buildMap(urls []Url) map[string]string {
 		pathsToUrls[url.Path] = url.Url
 	}
 	return pathsToUrls
+}
+
+func JSONHandler(jsonData []byte, fallback http.Handler) (http.HandlerFunc, error) {
+	parsedJson, err := parseJSON(jsonData)
+	if err != nil {
+		fmt.Println("Error parsing JSON in JSONHandler:", err)
+		return nil, err
+	}
+	pathMap := buildMap(parsedJson)
+	return MapHandler(pathMap, fallback), nil
+}
+
+func parseJSON(jsonData []byte) ([]Url, error) {
+	var urls []Url
+	err := json.Unmarshal(jsonData, &urls)
+	if err != nil {
+		panic(err)
+	}
+	return urls, nil
 }
