@@ -2,7 +2,7 @@ package main
 
 const (
 	UserName     string = "root"
-	Password     string = "mcoj1226NICS"
+	Password     string = "XXX"
 	Addr         string = "127.0.0.1"
 	Port         int    = 3306
 	Database     string = "phone"
